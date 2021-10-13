@@ -29,14 +29,13 @@
         color="primary"
         :label="tab == 'login' ? 'Login' : 'Sign Up'"
         style="width: 100px" />
-
       </div>
-
-
     </q-form>
   </div>
 </template>
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   name: '',
   components: {},
@@ -59,11 +58,17 @@ export default {
   beforeUnmount() {},
   unmounted() {},
   methods: {
+    ...mapActions('stores', ['signUpUser', 'loginUser']),
+
     submitForm() {
+      // 로그인
       if (this.tab == 'login') {
         console.log('login the user')
+        this.loginUser(this.formData)
       } else {
+        // 가입
         console.log('signup the user')
+        this.signUpUser(this.formData)
       }
     }
   }

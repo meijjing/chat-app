@@ -18,11 +18,11 @@
 
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel name="login">
-          <login-signUp :tab="tab" />
+          <Login-SignUp :tab="tab" />
         </q-tab-panel>
 
         <q-tab-panel name="signUp">
-          <login-signUp :tab="tab" />
+          <Login-SignUp :tab="tab" />
         </q-tab-panel>
 
       </q-tab-panels>
@@ -37,7 +37,7 @@ import LoginSignUp from 'components/LoginSignUp.vue'
 export default {
   name: 'AuthPage',
   components: {
-    'login-signUp': LoginSignUp
+    'Login-SignUp': LoginSignUp
   },
   setup() {
     return {

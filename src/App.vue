@@ -2,9 +2,15 @@
   <router-view />
 </template>
 <script>
-import { defineComponent } from 'vue';
+import { mapActions } from 'vuex';
 
-export default defineComponent({
-  name: 'App'
-})
+export default {
+  name: 'App',
+  methods: {
+    ...mapActions('stores', ['handleAuthStateChanged'])
+  },
+  mounted() {
+    this.handleAuthStateChanged()
+  }
+}
 </script>

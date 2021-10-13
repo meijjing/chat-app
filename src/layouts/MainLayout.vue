@@ -11,7 +11,7 @@
         dense
         />
 
-        <q-toolbar-title class="absolute-center">
+        <q-toolbar-title class="absolute-center" :key="$route.fullPath">
           {{ title }}
         </q-toolbar-title>
 
@@ -33,9 +33,11 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 
-// import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+
 
 export default {
   name: 'MainLayout',
@@ -43,38 +45,57 @@ export default {
   },
   data() {
     return {
-      title: '',
-      currentPath: this.$route.fullPath
+      // currentPath: this.$route.fullPath
+    }
+  },
+  setup () {
+    const title = ref('MeijjingChat')
+
+    onMounted(() => {
+      // console.log(this.$route.fullPath)
+
+
+      // if (currentPath == '/') {
+      //   title.value = 'MeijjingChat'
+      // } else if (currentPath == '/chat') {
+      //   title.value = 'Chat'
+      // } else if (currentPath == '/auth') {
+      //   title.value = 'Login'
+      // }
+
+    })
+
+    
+
+    // if (this.currentPath == '/') {
+    //   title.value = 'MeijjingChat'
+    // } else if (this.currentPath == '/chat') {
+    //   title.value = 'Chat'
+    // } else if (this.currentPath == '/auth') {
+    //   title.value = 'Login'
+    // }
+
+    
+
+    return {
+      title,
     }
   },
   created() {
-    console.log(this.currentPath)
-  },
-  setup () {
-    // const title = ref('');
-    // const currentPath = ref(this.$route.fullPath);
-
-    return {
-      // title,
-      // currentPath,
-    }
-  },
-  watch: {
-    currentPath() {
-      console.log(this.currentPath, '현재페이지')
-      // const currentPath = this.$route.fullPath
-
-      if (this.currentPath == '/') {
-        this.title = 'MeijjingChat'
-      } else if (this.currentPath === '/chat') {
-        this.title = 'Chat'
-      } else if (this.currentPath === '/auth') {
-        this.title = 'Login'
-      }
-
-    }
 
   },
+  // computed: {
+  //   ...mapState(),
+
+  //   title() {
+  //     let currentPath = this.$route.fullPath
+
+  //     if (currentPath == '/') return 'MeijjingChat'
+  //     else if (currentPath == '/chat') return 'Chat'
+  //     else if (currentPath == '/auth') return 'Login'
+  //   }
+
+  // },
   // created() {
   //     if (currentPath == '/') return 'MeijjingChat'
   //     else if (currentPath == '/chat') return 'Chat'
