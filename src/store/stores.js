@@ -64,10 +64,11 @@ const actions = {
 
         dispatch("firebaseUpdateUser", {
           userId: userId,
-          updates: {
+          onOff: {
             online: true,
           },
         });
+        console.log(userDetails);
 
         this.$router.push("/");
       } else {
@@ -76,7 +77,7 @@ const actions = {
 
         dispatch("firebaseUpdateUser", {
           userId: state.userDetails.userId,
-          updates: {
+          onOff: {
             online: false,
           },
         });
@@ -87,7 +88,7 @@ const actions = {
 
   firebaseUpdateUser({}, payload) {
     console.log(payload);
-    firebaseDb.ref("users/" + payload.userId).update(payload.updates);
+    firebaseDb.ref("users/" + payload.userId).update(payload.onOff);
   },
 
   // logout user
