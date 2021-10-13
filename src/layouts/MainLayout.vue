@@ -10,14 +10,24 @@
         flat
         dense
         />
+        {{ userDetails.name }}
 
-        <q-toolbar-title class="absolute-center" :key="$route.fullPath">
-          {{ title }}
+        <q-toolbar-title class="absolute-center">
+          <router-link to="/">{{ title }}</router-link>
         </q-toolbar-title>
 
         <q-btn
+        v-if="!userDetails.userId"
         to="/auth"
         icon="account_circle"
+        flat
+        dense
+        />
+
+        <q-btn
+        v-else
+        @click="logoutUser"
+        icon="logout"
         flat
         dense
         />
@@ -33,10 +43,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
-
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
+import { mapState, mapActions } from 'vuex'
 
 
 export default {
@@ -45,72 +53,36 @@ export default {
   },
   data() {
     return {
-      // currentPath: this.$route.fullPath
     }
   },
   setup () {
     const title = ref('MeijjingChat')
 
-    onMounted(() => {
-      // console.log(this.$route.fullPath)
-
-
-      // if (currentPath == '/') {
-      //   title.value = 'MeijjingChat'
-      // } else if (currentPath == '/chat') {
-      //   title.value = 'Chat'
-      // } else if (currentPath == '/auth') {
-      //   title.value = 'Login'
-      // }
-
-    })
-
-    
-
-    // if (this.currentPath == '/') {
-    //   title.value = 'MeijjingChat'
-    // } else if (this.currentPath == '/chat') {
-    //   title.value = 'Chat'
-    // } else if (this.currentPath == '/auth') {
-    //   title.value = 'Login'
-    // }
-
-    
-
     return {
       title,
     }
   },
-  created() {
+  updated() {
+    this.titleName();
+  },
+  computed: {
+    ...mapState('stores', ['userDetails']),
 
   },
-  // computed: {
-  //   ...mapState(),
+  methods: {
+    ...mapActions('stores', ['logoutUser']),
 
-  //   title() {
-  //     let currentPath = this.$route.fullPath
+    titleName() {
+      const currentPath = this.$route.fullPath
 
-  //     if (currentPath == '/') return 'MeijjingChat'
-  //     else if (currentPath == '/chat') return 'Chat'
-  //     else if (currentPath == '/auth') return 'Login'
-  //   }
-
-  // },
-  // created() {
-  //     if (currentPath == '/') return 'MeijjingChat'
-  //     else if (currentPath == '/chat') return 'Chat'
-  //     else if (currentPath == '/auth') return 'Login'
-  // },
-  // created () {
-  //   const currentPath = this.$route.fullPath
-
-  //   if (currentPath == '/') {
-  //     this.title = 'MeijjingChat'
-  //   } else if (currentPath === '/chat') {
-  //     this.title = 'Chat'
-  //   } else if (currentPath === '/auth') {
-  //     this.title = 'Login'
-  //   }
-  // }
+      if (currentPath == '/') {
+        this.title = 'MeijjingChat'
+      } else if (currentPath === '/chat') {
+        this.title = 'Chat'
+      } else if (currentPath === '/auth') {
+        this.title = 'Login'
+      }
+    }
+  }
 }
 </script>

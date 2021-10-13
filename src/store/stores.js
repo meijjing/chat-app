@@ -1,75 +1,99 @@
-import { firebaseAuth, firebaseDb } from 'boot/firebase';
+import { firebaseAuth, firebaseDb } from "boot/firebase";
 
 const state = {
-  userDetails: {}
+  userDetails: {},
 };
 
 const mutations = {
   setUserDetails(state, payload) {
-    state.userDetails = payload
-  }
+    state.userDetails = payload;
+  },
 };
 
 const actions = {
   // 가입
   signUpUser({}, payload) {
-    console.log('payload: ', payload);
+    console.log("payload: ", payload);
 
-    firebaseAuth.createUserWithEmailAndPassword(payload.email, payload.password)
-    .then(response => {
-      console.log(response)
+    firebaseAuth
+      .createUserWithEmailAndPassword(payload.email, payload.password)
+      .then((response) => {
+        console.log(response);
 
-      let userId = firebaseAuth.currentUser.uid
-      firebaseDb.ref('users/' + userId).set({
-        email : payload.email,
-        name : payload.name, 
-        online: true
+        let userId = firebaseAuth.currentUser.uid;
+        firebaseDb.ref("users/" + userId).set({
+          email: payload.email,
+          name: payload.name,
+          online: true,
+        });
       })
-    })
-    .catch(err => {
-      console.log(err)
-    })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 
   // 로그인
   loginUser({}, payload) {
-
-    firebaseAuth.signInWithEmailAndPassword(payload.email, payload.password)
-    .then(response => {
-      console.log(response)
-    })
-    .catch(err => {
-      console.log(err)
-    })
+    firebaseAuth
+      .signInWithEmailAndPassword(payload.email, payload.password)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 
-  handleAuthStateChanged({ commit }) {
-    // console.log('handleAuthStateChanged');
-    firebaseAuth.onAuthStateChanged(user => {
+  handleAuthStateChanged({ commit, dispatch, state }) {
+    console.log("handleAuthStateChanged");
+    firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
         // login
-        let userId = firebaseAuth.currentUser.uid
-        firebaseDb.ref('users/' + userId).once('value', snapshot => {
+        let userId = firebaseAuth.currentUser.uid;
+        firebaseDb.ref("users/" + userId).once("value", (snapshot) => {
           // console.log(snapshot)
-          let userDetails = snapshot.val()
+          let userDetails = snapshot.val();
           // console.log('userDetails', userDetails)
 
-          commit('setUserDetails', {
+          commit("setUserDetails", {
             name: userDetails.name,
             email: userDetails.email,
-            userId: userId
-          })
-        })
+            userId: userId,
+          });
+        });
 
+        dispatch("firebaseUpdateUser", {
+          userId: userId,
+          updates: {
+            online: true,
+          },
+        });
+
+        this.$router.push("/");
       } else {
         // logout
-        commit('setUserDetails', {})
+        commit("setUserDetails", {});
 
-
-
+        dispatch("firebaseUpdateUser", {
+          userId: state.userDetails.userId,
+          updates: {
+            online: false,
+          },
+        });
+        this.$router.replace("/auth");
       }
-    })
-  }
+    });
+  },
+
+  firebaseUpdateUser({}, payload) {
+    console.log(payload);
+    firebaseDb.ref("users/" + payload.userId).update(payload.updates);
+  },
+
+  // logout user
+  logoutUser() {
+    firebaseAuth.signOut();
+  },
 };
 
 const getters = {};
