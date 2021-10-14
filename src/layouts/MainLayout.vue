@@ -10,7 +10,13 @@
         flat
         dense
         />
-        {{ userDetails.name }}
+        <q-btn
+        v-if="$route.fullPath == '/'"
+        icon="info"
+        flat
+        dense
+        />
+        <!-- {{ userDetails.name }} -->
 
         <q-toolbar-title class="absolute-center">
           <router-link to="/">{{ title }}</router-link>
@@ -45,10 +51,12 @@
 <script>
 import { ref } from 'vue'
 import { mapState, mapActions } from 'vuex'
+import mixinOtherUserDetails from 'src/mixins/mixin-other-user-details.js'
 
 
 export default {
   name: 'MainLayout',
+  mixins: [mixinOtherUserDetails],
   components: {
   },
   data() {
@@ -69,6 +77,9 @@ export default {
     ...mapState('stores', ['userDetails']),
 
   },
+  created() {
+    console.log('otherUserId', this.$route.params.otherUserId)
+  },
   methods: {
     ...mapActions('stores', ['logoutUser']),
 
@@ -77,8 +88,8 @@ export default {
 
       if (currentPath == '/') {
         this.title = 'MeijjingChat'
-      } else if (currentPath === '/chat') {
-        this.title = 'Chat'
+      } else if (currentPath.includes('/chat')) {
+        this.title = this.otherUserDetails.name
       } else if (currentPath === '/auth') {
         this.title = 'Login'
       }
@@ -86,3 +97,5 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+</style>

@@ -49,14 +49,6 @@ export default {
       }
     };
   },
-  setup() {},
-  created() {},
-  beforeMount() {},
-  mounted() {},
-  beforeUpdate() {},
-  updated() {},
-  beforeUnmount() {},
-  unmounted() {},
   methods: {
     ...mapActions('stores', ['signUpUser', 'loginUser']),
 

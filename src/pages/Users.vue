@@ -5,9 +5,9 @@
     separator>
 
       <q-item
-      v-for="user in users"
-      :key="user.id"
-      to="/chat"
+      v-for="(user, key) in users"
+      :key="key"
+      :to="'/chat/' + key"
       class="q-py-md"
       clickable
       v-ripple>
@@ -34,36 +34,15 @@
 </template>
 
 <script>
-
-
-
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'UsersPage',
-  data() {
-    return {
-      users: [
-        {
-          id: 1,
-          name: 'Ruddy Jedrzej',
-          online: true
-        },
-        {
-          id: 2,
-          name: 'Mallorie Alessandrini',
-          online: false
-        },
-        {
-          id: 3,
-          name: 'Elisabetta Wicklen',
-          online: true
-        }
-      ]
-    }
+  computed: {
+    ...mapGetters('stores', ['users'])
   },
-  setup() {
-    return {
-    }
-  }
+  // created() {
+  //   console.log('여기유저', this.users)
+  // }
 }
 </script>

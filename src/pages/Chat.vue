@@ -1,18 +1,24 @@
 <template>
-  <q-page class="flex column">
+  <q-page
+  ref="pageChat"
+  class="page-chat flex column">
 
-    <q-banner class="bg-grey-4 text-center">
-      User is offline.
+    <q-banner
+    v-if="!otherUserDetails.online"
+    class="bg-grey-4 text-center fixed-top">
+      {{ otherUserDetails.name }} is offline.
     </q-banner>
 
-    <div class="q-pa-md column col justify-end">
+    <div
+    :class="{ 'invisible' : !showMessages }"
+    class="q-pa-md column col justify-end">
       <q-chat-message
-        v-for="(message, i) in messages"
-        :key="i"
-        :name="message.from"
+        v-for="(message, key) in messages"
+        :key="key"
+        :name="message.from == 'me' ? userDetails.name : otherUserDetails.name"
         :text="[message.text]"
         :sent="message.from == 'me' ? true : false"
-        :bg-color="message.from == 'me' ? 'grey-4' : 'blue-4'"
+        :bg-color="message.from == 'me' ? 'indigo-11' : 'white'"
       />
     </div>
 
@@ -22,6 +28,7 @@
         <q-form class="full-width">
           <q-input
           v-model="newMessage"
+          ref="newMessage"
           bg-color="white"
           outlined
           rounded
@@ -40,65 +47,125 @@
 </template>
 
 <script>
-// import { ref } from 'vue'
+import { mapState, mapActions } from 'vuex'
+import mixinOtherUserDetails from 'src/mixins/mixin-other-user-details.js'
 
 export default {
   name: 'ChatPage',
+  mixins: [mixinOtherUserDetails],
   data() {
     return {
       newMessage: '',
-      messages: [
-        {
-          text: 'Hey, How r u',
-          from: 'me'
-        },
-        {
-          text: 'Good thanks, How r u?',
-          from: 'Ryan'
-        },
-        {
-          text: 'Pretty good!',
-          from: 'me'
-        }
-      ],
+      showMessages: false
     }
   },
-  // setup() {
-  //   const newMessage = ref('')
-  //   const messages = [
-  //     {
-  //       text: 'Hey, How r u',
-  //       from: 'me'
-  //     },
-  //     {
-  //       text: 'Good thanks, How r u?',
-  //       from: 'Ryan'
-  //     },
-  //     {
-  //       text: 'Pretty good!',
-  //       from: 'me'
-  //     }
-  //   ]
-  //   return {
-  //     newMessage,
-  //     messages,
-
-  //     sendMessage() {
-  //       console.log('send Message!!')
-  //       messages.push({
-  //         text: this.newMessage,
-  //         from: 'me'
-  //       })
-  //     }
-  //   }
-  // },
-  methods: {
-    sendMessage() {
-      this.messages.push({
-        text: this.newMessage,
-        from: 'me'
-      })
+  computed: {
+    ...mapState('stores', ['messages', 'userDetails']),
+    otherUserDetails() {
+      console.log('otherUserDetails: ', this.$store.state.stores.users[this.$route.params.otherUserId])
+      return this.$store.state.stores.users[this.$route.params.otherUserId]
     }
-  }
+  },
+  watch: {
+    messages() {
+      // 화면에 추가된 후 동작하도록
+      this.$nextTick(() => {
+        console.log('page scroll!!')
+        let pageChat = this.$refs.pageChat;
+
+        pageChat.scrollTo({ top: pageChat.scrollHeight, behavior: 'smooth' });
+      });
+    },
+
+  },
+  // created () {
+  //   this.scrollToBottom()
+  // },
+  mounted() {
+    this.firebaseGetMessage(this.$route.params.otherUserId)
+    console.log('mounted!!!!!')
+    this.scrollToBottom()
+  },
+  unmounted() {
+    this.firebaseStopGettingMessages()
+  },
+  methods: {
+    ...mapActions('stores', ['firebaseGetMessage', 'firebaseStopGettingMessages', 'firebaseSendMessage']),
+    sendMessage() {
+      this.firebaseSendMessage({
+        message: {
+          text: this.newMessage,
+          from: 'me'
+        },
+        otherUserId: this.$route.params.otherUserId
+      })
+      this.clearMessage()
+    },
+    clearMessage() {
+      this.newMessage = ''
+      this.$refs.newMessage.focus()
+    },
+    scrollToBottom() {
+      let pageChatBox = this.$refs.pageChat.$el;
+      setTimeout(() => {
+
+        // window.scrollTo(0, pageChatBox.scrollHeight)
+        // window.scrollTop = pageChatBox.scrollHeight
+        pageChatBox.scrollTop = pageChatBox.scrollHeight
+        this.showMessages = true
+      }, 20);
+
+    }
+  },
+
 }
 </script>
+<style scoped lang="scss">
+
+.page-chat {
+  background: #e7e5f3;
+  &:before {
+    content: '';
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 0;
+    opacity: .1;
+    background: 
+    linear-gradient(135deg, #5d5a74 21px, #d9ecff 22px, #d9ecff 24px, transparent 24px, transparent 67px, #d9ecff 67px, #d9ecff 69px, transparent 69px),
+    linear-gradient(225deg, #5d5a74 21px, #d9ecff 22px, #d9ecff 24px, transparent 24px, transparent 67px, #d9ecff 67px, #d9ecff 69px, transparent 69px)0 64px;
+    background-color:#5d5a74;
+    background-size: 64px 128px;
+  }
+}
+.q-banner {
+  top: 50px;
+  z-index: 2;
+  background-color: #acacb6!important;
+  opacity: .8;
+  color: #000;
+  box-shadow: 0 2px 8px 2px rgba(0,0,0,0.3);
+}
+
+.q-message {
+  z-index: 1;
+
+  .q-message-name {
+    margin-bottom: 3px!important;
+  }
+
+  .q-message-text {
+    padding: 10px 20px!important;
+    display: flex!important;;
+    align-items: center!important;;
+  }
+}
+
+
+
+
+
+</style>
