@@ -2,7 +2,6 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar class="justify-between">
-
         <q-btn
         v-if="$route.fullPath.includes('/chat')"
         @click="this.$router.go(-1)"
@@ -16,23 +15,28 @@
         flat
         dense
         />
-        <!-- {{ userDetails.name }} -->
-
         <q-toolbar-title class="absolute-center">
-          <router-link to="/">{{ title }}</router-link>
+          {{ title }}
         </q-toolbar-title>
 
-        <q-btn
+        <!-- <q-btn
         v-if="!userDetails.userId"
         to="/auth"
         icon="account_circle"
         flat
         dense
         />
-
         <q-btn
         v-else
         @click="logoutUser"
+        icon="logout"
+        flat
+        dense
+        /> -->
+
+        <q-btn
+        v-if="userDetails.userId"
+        @click="logoutUser(userDetails)"
         icon="logout"
         flat
         dense
@@ -75,14 +79,9 @@ export default {
   },
   computed: {
     ...mapState('stores', ['userDetails']),
-
-  },
-  created() {
-    console.log('otherUserId', this.$route.params.otherUserId)
   },
   methods: {
     ...mapActions('stores', ['logoutUser']),
-
     titleName() {
       const currentPath = this.$route.fullPath
 
@@ -93,7 +92,7 @@ export default {
       } else if (currentPath === '/auth') {
         this.title = 'Login'
       }
-    }
+    },
   }
 }
 </script>

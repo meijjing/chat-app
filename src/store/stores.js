@@ -29,7 +29,6 @@ const mutations = {
 };
 
 const actions = {
-  // 가입
   signUpUser({}, payload) {
     firebaseAuth
       .createUserWithEmailAndPassword(payload.email, payload.password)
@@ -48,7 +47,6 @@ const actions = {
       });
   },
 
-  // 로그인
   loginUser({}, payload) {
     firebaseAuth
       .signInWithEmailAndPassword(payload.email, payload.password)
@@ -56,23 +54,38 @@ const actions = {
         console.log(response);
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.message);
+        if ( err.message.includes('There is no user record corresponding to this identifier. The user may have been deleted')) {
+          Swal.fire('이메일을 확인해 주세요.')
+
+        } else if (err.message.includes('The password is invalid or the user does not have a password')) {
+          Swal.fire('비밀번호를 확인해 주세요.')
+        }
       });
   },
 
-  // logout user
-  logoutUser() {
+  logoutUser({ dispatch }, payload) {
+    // console.log(payload);
+    firebaseAuth.onAuthStateChanged(() => {
+
+    console.log(payload);
+
+      dispatch("firebaseUpdateUser", {
+        userId: payload.userId,
+        onOff: {
+          online: false,
+        },
+      });
+      this.$router.replace("/auth");
+    })
     firebaseAuth.signOut();
   },
 
   handleAuthStateChanged({ commit, dispatch, state }) {
-    console.log("handleAuthStateChanged");
     firebaseAuth.onAuthStateChanged((user) => {
+      // console.log(user)
 
-      
       if (user) {
-        console.log('user on')
-        // login
         let userId = firebaseAuth.currentUser.uid;
         firebaseDb.ref("users/" + userId).once("value", (snapshot) => {
           let userDetails = snapshot.val();
@@ -91,23 +104,16 @@ const actions = {
           },
         });
         dispatch("firebaseGetUsers")
-
         this.$router.push("/");
       
-      
-      
       } else {
-
-        console.log("user off")
-        // logout
         // commit("setUserDetails", {});
-
-        dispatch("firebaseUpdateUser", {
-          userId: state.userDetails.userId,
-          onOff: {
-            online: false,
-          },
-        });
+        // dispatch("firebaseUpdateUser", {
+        //   userId: state.userDetails.userId,
+        //   onOff: {
+        //     online: false,
+        //   },
+        // });
         this.$router.replace("/auth");
       }
     });
@@ -188,3 +194,6 @@ export default {
   actions,
   getters
 };
+
+
+

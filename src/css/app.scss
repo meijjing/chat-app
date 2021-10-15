@@ -3,3 +3,23 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+}
+
+.swal2-header {
+  padding: 0
+}
+
+#swal2-title {
+  margin: 0;
+  font-size: 1.375rem;
+
+}
+
+.swal2-confirm {
+  background-color: #fa8b31!important;
+  outline: none!important;
+}

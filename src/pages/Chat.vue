@@ -11,14 +11,12 @@
     </q-banner>
 
     <div
-    
-
     :class="{ 'invisible' : !showMessages }"
     class="q-pa-md column col justify-end">
       <q-chat-message
         v-for="(message, key) in messages"
         :key="key"
-        :name="message.from == 'me' ? userDetails.name : otherUserDetails.name"
+        :name="message.from == 'me' ? '' : otherUserDetails.name"
         :text="[message.text]"
         :sent="message.from == 'me' ? true : false"
         :bg-color="message.from == 'me' ? 'indigo-11' : 'white'"
@@ -87,7 +85,6 @@ export default {
   // },
   mounted() {
     this.firebaseGetMessage(this.$route.params.otherUserId)
-    console.log('mounted!!!!!')
     this.scrollToBottom()
   },
   unmounted() {
