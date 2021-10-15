@@ -1,5 +1,6 @@
 <template>
   <q-page
+  id="pageChat"
   ref="pageChat"
   class="page-chat flex column">
 
@@ -10,6 +11,8 @@
     </q-banner>
 
     <div
+    
+
     :class="{ 'invisible' : !showMessages }"
     class="q-pa-md column col justify-end">
       <q-chat-message
@@ -48,6 +51,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import { ref } from 'vue'
 import mixinOtherUserDetails from 'src/mixins/mixin-other-user-details.js'
 
 export default {
@@ -67,15 +71,15 @@ export default {
     }
   },
   watch: {
-    messages() {
-      // 화면에 추가된 후 동작하도록
-      this.$nextTick(() => {
-        console.log('page scroll!!')
-        let pageChat = this.$refs.pageChat;
-
-        pageChat.scrollTo({ top: pageChat.scrollHeight, behavior: 'smooth' });
-      });
-    },
+    // messages() {
+    //   // 화면에 추가된 후 동작하도록
+    //   this.$nextTick(() => {
+    //     console.log('page scroll!!')
+    //     let pageChat = this.$refs.pageChat;
+    //     console.log(pageChat.scrollHeight)
+    //     pageChat.scrollTo({ top: pageChat.scrollHeight, behavior: 'smooth' });
+    //   });
+    // },
 
   },
   // created () {
@@ -106,15 +110,11 @@ export default {
       this.$refs.newMessage.focus()
     },
     scrollToBottom() {
-      let pageChatBox = this.$refs.pageChat.$el;
+      const el = this.$refs.pageChat.$el;
       setTimeout(() => {
-
-        // window.scrollTo(0, pageChatBox.scrollHeight)
-        // window.scrollTop = pageChatBox.scrollHeight
-        pageChatBox.scrollTop = pageChatBox.scrollHeight
+        window.scrollTo(0, el.scrollHeight)
         this.showMessages = true
-      }, 20);
-
+      }, 100)
     }
   },
 
