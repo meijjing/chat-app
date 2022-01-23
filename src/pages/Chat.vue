@@ -11,8 +11,8 @@
     </q-banner>
 
     <div
-    :class="{ 'invisible' : !showMessages }"
-    class="q-pa-md column col justify-end">
+    :class="{ 'invisible' : !showMessages }" 
+    class="q-pa-md column col justify-end" id="chatRef">
       <q-chat-message
         v-for="(message, key) in messages"
         :key="key"
@@ -26,21 +26,17 @@
 
     <q-footer elevated>
       <q-toolbar>
-        <q-form class="full-width">
+        <q-form class="full-width" @submit="sendMessage">
           <q-input
           v-model="newMessage"
           ref="newMessage"
           bg-color="white"
+          autofocus
           outlined
           rounded
-          label="Message"
           dense
-          @keyup.enter="sendMessage"
-          >
-            <template v-slot:after>
-              <q-btn round dense flat icon="send" color="white" @click="sendMessage" />
-            </template>
-          </q-input>
+          />
+          <q-btn round dense flat icon="send" color="white" type="submit" />
         </q-form>
       </q-toolbar>
     </q-footer>
@@ -69,15 +65,15 @@ export default {
     }
   },
   watch: {
-    // messages() {
-    //   // 화면에 추가된 후 동작하도록
-    //   this.$nextTick(() => {
-    //     console.log('page scroll!!')
-    //     let pageChat = this.$refs.pageChat;
-    //     console.log(pageChat.scrollHeight)
-    //     pageChat.scrollTo({ top: pageChat.scrollHeight, behavior: 'smooth' });
-    //   });
-    // },
+    messages() {
+      // 화면에 추가된 후 동작하도록
+      this.$nextTick(() => {
+        console.log('page scroll!!')
+        let pageChat = this.$refs.pageChat;
+        console.log(pageChat.scrollHeight)
+        pageChat.scrollTo({ top: pageChat.scrollHeight, behavior: 'smooth' });
+      });
+    },
 
   },
   // created () {
@@ -86,6 +82,8 @@ export default {
   mounted() {
     this.firebaseGetMessage(this.$route.params.otherUserId)
     this.scrollToBottom()
+    console.log(document.getElementById('chatRef').clientHeight)
+    const h = document.getElementById('chatRef').clientHeight;
   },
   unmounted() {
     this.firebaseStopGettingMessages()
@@ -93,14 +91,16 @@ export default {
   methods: {
     ...mapActions('stores', ['firebaseGetMessage', 'firebaseStopGettingMessages', 'firebaseSendMessage']),
     sendMessage() {
-      this.firebaseSendMessage({
-        message: {
-          text: this.newMessage,
-          from: 'me'
-        },
-        otherUserId: this.$route.params.otherUserId
-      })
-      this.clearMessage()
+      if (this.newMessage) {
+        this.firebaseSendMessage({
+          message: {
+            text: this.newMessage,
+            from: 'me'
+          },
+          otherUserId: this.$route.params.otherUserId
+        })
+        this.clearMessage()
+      }
     },
     clearMessage() {
       this.newMessage = ''
@@ -136,6 +136,23 @@ export default {
     linear-gradient(225deg, #5d5a74 21px, #d9ecff 22px, #d9ecff 24px, transparent 24px, transparent 67px, #d9ecff 67px, #d9ecff 69px, transparent 69px)0 64px;
     background-color:#5d5a74;
     background-size: 64px 128px;
+  }
+
+  .q-footer {
+    .q-toolbar {
+      .q-form {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+        .q-field {
+          width: 100%;
+        }
+        .q-btn {
+          margin-left: 12px;
+        }
+      }
+    }
   }
 }
 .q-banner {
